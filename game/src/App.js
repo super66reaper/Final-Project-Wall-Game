@@ -36,11 +36,10 @@ let trueWallX = -500;
 let currentLevel = 0;
 let levelWalls;
 let editing = false;
+let totalLevels = 0;
 
 //Collisions
 let previousPlayerX = x
-
-let addingLevel = false;
 
 function App() {
   return Main()
@@ -94,6 +93,7 @@ function Main() {
       }
 
       //Delete All Current Levels
+      console.log("Deleting Levels")
       deleteAll().catch(err => console.log(err))
 
       //Add Levels
@@ -106,7 +106,6 @@ function Main() {
 
   const addWallToNewLevel = (event) => {
     event.preventDefault()
-    addingLevel = true;
 
     //Create Level
     const levelObject = {
@@ -128,7 +127,6 @@ function Main() {
       .then(response => {
         console.log(response.data)
         setLevels(levels.concat(response.data))
-        addingLevel = false
     })
   }
 
@@ -137,7 +135,8 @@ function Main() {
       levelsToAdd.map(element => axios.post(url, element))
     ).then(response => {
       setLevels(levels.concat(response.data))
-      levelWalls = levels.walls
+      levelWalls = levels[currentLevel - 1].walls
+      hook()
     })
   }
 
@@ -153,9 +152,9 @@ function Main() {
 
   async function deleteAll() {
     await Promise.all(
-      levels.map(element => axios.delete(url+element.id))
-    ).then ( response => {
-      setLevels(response.data)
+      levels.map(element => axios.delete(url+element.id, element))
+    ).then ( (response) => {
+      setLevels(new Array(0))
     })
     loadLevel()
   }
@@ -181,9 +180,9 @@ function Main() {
     console.log("reseting")
     
     resetLevel()
-    if(currentLevel > levels.length) {
+    if(currentLevel > totalLevels) {
       console.log("No level with id of: " + currentLevel)
-      if(levels.length <= 0) {
+      if(totalLevels <= 0) {
         console.log("Reseting at level 0")
         currentLevel = 0
       }else {
@@ -237,7 +236,7 @@ function Main() {
     //Text
     p5.textSize(25)
     p5.fill(255,255,255)
-    p5.text("Level: " + currentLevel + "/" + levels.length, 15, 25)
+    p5.text("Level: " + currentLevel + "/" + totalLevels, 15, 25)
 
     //Player
     if(!dead && !editing) {
@@ -284,6 +283,9 @@ function Main() {
 
     //Player
     dashTimer();
+
+    //Levels
+    getTotalLevels();
 
     //Collision
     testPlayerCollision();
@@ -342,6 +344,15 @@ function Main() {
       console.log("Level Finished")
       currentLevel++;
       loadLevel();
+    }
+  }
+
+  const getTotalLevels = () => {
+    //console.log(levels)
+    if(levels.length === null) {
+      totalLevels = 0;
+    }else {
+      totalLevels = levels.length
     }
   }
 
