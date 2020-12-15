@@ -2,15 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 
-//BASICS
 //Move Vertical*
 //Dash To The Right*
 //Start at left of screen and get to right side to progress*
 //Darkness from left side forcing you to move at constant rate*
 //Walls that player has to dodge*
 //Level system with arrays that level loader loads into game*
-
-//REACT
 //Spreadsheet that I learned about to import levels*
 //-Uploads should always be saved-*
 //Game loads up levels from spreadsheet*
